@@ -10,6 +10,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.hadoop.manip3.AvgWorkHoursCombiner;
 import org.hadoop.manip3.AvgWorkHoursMapper;
 import org.hadoop.manip3.AvgWorkHoursReducer;
+import org.hadoop.manip3.NumPair;
 
 public class AverageCalculator {
     public static void main(String[] args)  {
@@ -21,14 +22,16 @@ public class AverageCalculator {
 
         try {
             Configuration conf = new Configuration();
-            conf.set("fs.defaultFS", "file:///");
-            conf.set("mapreduce.framework.name", "local");
-
             Job job = Job.getInstance(conf, "Average calculation");
+
             job.setJarByClass(AverageCalculator.class);
             job.setMapperClass(AvgWorkHoursMapper.class);
             job.setCombinerClass(AvgWorkHoursCombiner.class);
             job.setReducerClass(AvgWorkHoursReducer.class);
+
+            // Configurer les types
+            job.setMapOutputKeyClass(Text.class);
+            job.setMapOutputValueClass(NumPair.class);
 
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);

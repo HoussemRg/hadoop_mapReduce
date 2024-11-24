@@ -6,19 +6,19 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-public class AvgWorkHoursReducer extends Reducer<Text, Text, Text, Text> {
+public class AvgWorkHoursReducer extends Reducer<Text, NumPair, Text, Text> {
 
-    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-        double sum = 0;
-        int count = 0;
+    public void reduce(Text key, Iterable<NumPair> values, Context context) throws IOException, InterruptedException {
+        double totalSum = 0;
+        int totalCount = 0;
 
-        for (Text value : values) {
-            String[] parts = value.toString().split(",");
-            sum += Double.parseDouble(parts[0]);
-            count += Integer.parseInt(parts[1]);
+        for (NumPair pair : values) {
+            totalSum += pair.getSum();
+            totalCount += pair.getCount();
         }
 
-        double average = sum / count;
-        context.write(key, new Text(String.valueOf(average)));
+        // Calculer la moyenne
+        double average = totalCount > 0 ? totalSum / totalCount : 0;
+        context.write(key, new Text(String.format("%.2f", average)));
     }
 }
